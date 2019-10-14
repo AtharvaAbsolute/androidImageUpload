@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "45100528880",
+    "firebase_url": "https://androidimageupload-acd0e.firebaseio.com",
+    "project_id": "androidimageupload-acd0e",
+    "storage_bucket": "androidimageupload-acd0e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45100528880:android:781cded2f5e79328993e35",
+        "android_client_info": {
+          "package_name": "com.example.androidimageupload"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "45100528880-a4rvmig7otnk1fe9ju2hr8h3kkk7fkht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.androidimageupload",
+            "certificate_hash": "e43ed28e852c2820fa02d21a6204d56229e5f0cd"
+          }
+        },
+        {
+          "client_id": "45100528880-v9r81mlmdmbcl2226cd99k4kc3ag19o0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEYamYST8L21rlqmg4IhhEfZCi7HDe3Rc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "45100528880-v9r81mlmdmbcl2226cd99k4kc3ag19o0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
