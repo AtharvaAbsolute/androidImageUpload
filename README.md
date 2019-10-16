@@ -1,6 +1,7 @@
 # Android Image Upload
 An app that demonstrates simple uploading of images from camera and gallery and shows them on a separate page after downloading them from a server.
 
+##Firebase is used as a cloud server for persistence and storage
 
 ## Sreenshots
 ![alt text](https://github.com/AtharvaAbsolute/androidImageUpload/blob/master/app/src/main/java/com/example/androidimageupload/Screenshots/permissions.png "1")
