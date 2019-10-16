@@ -38,8 +38,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/camera_click"
-                android:tint="#000000" />
+                android:src="@drawable/cam_color" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -62,8 +61,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/gallery"
-                android:tint="#000000" />
+                android:src="@drawable/gallery_color" />
 
             <TextView
                 android:layout_width="wrap_content"

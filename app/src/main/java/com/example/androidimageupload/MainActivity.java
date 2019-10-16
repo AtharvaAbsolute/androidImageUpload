@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.View;
@@ -38,8 +37,10 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -90,18 +91,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         galleryUpload.setOnClickListener(this);
         viewUploadedImages.setOnClickListener(this);
 
+
+        // Initializing firebase reference variables
         storageReference = FirebaseStorage.getInstance().getReference("uploads");
         databaseReference = FirebaseDatabase.getInstance().getReference("uploads");
 
     }
 
+
+    // Method to capture image from the camera
+
     private void captureImage() {
-       /* Intent chooserIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(chooserIntent, CAMERA_REQUEST);*/
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
             Intent chooserIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            File f = new File(Environment.getExternalStorageDirectory(), "profile.jpg");
-            chooserIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
             startActivityForResult(chooserIntent, CAMERA_REQUEST);
         } else {
             ContentValues values = new ContentValues();
@@ -118,6 +120,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+    // method for selecting images from the gallery
+
     private void chooseImageFromGallery() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -133,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (requestCode) {
             case CAMERA_REQUEST:
-                try {
+                try {   // sending the captured image to CropActivity for further processing
                     if (resultCode == Activity.RESULT_OK) {
                         CropImage.activity(imageUri)
                                 .setFixAspectRatio(true)
@@ -144,18 +149,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case PICK_IMAGE:
-                try {
+                try {   // sending the selected image for cropping
                     if (resultCode == Activity.RESULT_OK) {
                         assert data != null;
                         CropImage.activity(data.getData())
                                 .setFixAspectRatio(true)
                                 .start(this);
+//                        uploadFile(data.getData());
                     }
                 } catch (Exception e) {
                     Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
                 }
                 break;
 
+
+            // Crop Activity receives a full sized image and crops it according to the user
             case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 if (resultCode == RESULT_OK) {
@@ -167,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else
                         uploadFile(resultUri);
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-
+                    Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -175,6 +183,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+    // method for getting the file extension
     public String GetFileExtension(Uri uri) {
 
         ContentResolver contentResolver = getContentResolver();
@@ -186,15 +196,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+    // method for uploading files to Firebase Storage and Realtime Database
     private void uploadFile(Uri fileUri) {
         final StorageReference fileReference = storageReference.child(System.currentTimeMillis() + "." + GetFileExtension(fileUri));
         uploadTask = fileReference.putFile(fileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                UploadModel uploadModel = new UploadModel("New Image", taskSnapshot.getMetadata().getReference().getStorage().getReference().getDownloadUrl().toString());
-                String uploadId = databaseReference.push().getKey();
-                assert uploadId != null;
-                databaseReference.child(uploadId).setValue(uploadModel);
+            public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+
+                fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        DateFormat df = new SimpleDateFormat("yyyyMMdd  HH:mm");
+                        String sdt = df.format(new Date(System.currentTimeMillis()));
+                        String url = uri.toString();
+                        UploadModel uploadModel = new UploadModel(sdt, url);
+                        String uploadId = databaseReference.push().getKey();
+                        assert uploadId != null;
+                        databaseReference.child(uploadId).setValue(uploadModel);
+                    }
+                });
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -209,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-
+                Toast.makeText(MainActivity.this, "Something went wrong !!", Toast.LENGTH_SHORT).show();
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -223,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    // requesting runtime permissions to avoid ANRs and ambiguous operations
     private boolean checkAndRequestPermission() {
         List<String> appPermissionsNeeded = new ArrayList<>();
         for (String perm : appPermisssions) {

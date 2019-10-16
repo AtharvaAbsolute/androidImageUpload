@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -32,10 +32,12 @@ public class ShowImagesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_images);
         showImagesrecyclerView = findViewById(R.id.show_images_recycler_view);
         showImagesrecyclerView.setHasFixedSize(true);
-        showImagesrecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        showImagesrecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         uploadModelList = new ArrayList<>();
 
         databaseReference = FirebaseDatabase.getInstance().getReference("uploads");
+
+        // downloading data from the database
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
